@@ -42,6 +42,7 @@ async function run() {
         const productCollection = client.db('ar_parts_manufacturer').collection('products');
         const orderCollection = client.db('ar_parts_manufacturer').collection('orders');
         const userCollection = client.db('ar_parts_manufacturer').collection('users');
+        const reviewCollection = client.db('ar_parts_manufacturer').collection('reviews');
 
 
         const verifyAdmin = async (req, res, next) => {
@@ -138,6 +139,17 @@ async function run() {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             return res.send({ success: true, result });
+        })
+
+        app.get('/review', async(req, res) =>{
+            const reviews = await reviewCollection.find().toArray();
+            res.send(reviews);
+        })
+
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            return res.send(result);
         })
 
         app.delete('/order/:id', verifyJWT, async (req, res) => {
