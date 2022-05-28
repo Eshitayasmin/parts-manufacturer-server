@@ -45,6 +45,7 @@ async function run() {
         const userCollection = client.db('ar_parts_manufacturer').collection('users');
         const reviewCollection = client.db('ar_parts_manufacturer').collection('reviews');
         const paymentCollection = client.db('ar_parts_manufacturer').collection('payments');
+        const profileCollection = client.db('ar_parts_manufacturer').collection('profiles');
 
 
         const verifyAdmin = async (req, res, next) => {
@@ -201,6 +202,11 @@ async function run() {
         app.post('/review', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
+            return res.send(result);
+        })
+        app.post('/profile', async (req, res) => {
+            const profile = req.body;
+            const result = await profileCollection.insertOne(profile);
             return res.send(result);
         })
 
