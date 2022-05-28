@@ -45,16 +45,16 @@ async function run() {
         const reviewCollection = client.db('ar_parts_manufacturer').collection('reviews');
 
 
-        // const verifyAdmin = async (req, res, next) => {
-        //     const requester = req.decoded.email;
-        //     const requesterAccount = await userCollection.findOne({ email: requester });
-        //     if (requesterAccount.role === 'admin') {
-        //         next();
-        //     }
-        //     else {
-        //         return res.status(403).send({ message: 'Forbidden Access' });
-        //     }
-        // }
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                next();
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidden Access' });
+            }
+        }
 
         app.get('/product', async (req, res) => {
             const products = await productCollection.find().toArray();
@@ -135,7 +135,14 @@ async function run() {
             res.send(orders);
         })
 
-        app.post('/order', async (req, res) => {
+        app.get('/order/:id', async(req,res) =>{
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.findOne(query);
+            res.send(result);
+        })
+
+        app.post('/order', verifyJWT, async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             return res.send({ success: true, result });
