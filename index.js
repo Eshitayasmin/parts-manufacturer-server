@@ -62,7 +62,7 @@ async function run() {
             const products = await productCollection.find().toArray();
             res.send(products);
         })
-        
+
 
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
@@ -82,17 +82,17 @@ async function run() {
             res.send(users);
         })
 
-        app.post('/create-payment-intent', async(req, res) =>{
+        app.post('/create-payment-intent', async (req, res) => {
             const product = req.body;
             const price = product.price;
-            const amount = price*100;
+            const amount = price * 100;
             const paymentIntent = await stripe.paymentIntents.create({
-              amount : amount,
-              currency: 'usd',
-              payment_method_types:['card']
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
             });
-            res.send({clientSecret: paymentIntent.client_secret})
-          });
+            res.send({ clientSecret: paymentIntent.client_secret })
+        });
 
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -144,25 +144,26 @@ async function run() {
             }
         })
 
-        app.get('/order', async(req, res) =>{
+        app.get('/order', async (req, res) => {
             const orders = await orderCollection.find().toArray();
             res.send(orders);
         })
 
-        app.get('/booking/:id', verifyJWT, async(req, res) =>{
+        app.get('/booking/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)};
+            const query = { _id: ObjectId(id) };
             const order = await orderCollection.findOne(query);
             res.send(order);
-          })
+        })
 
-          app.patch('/booking/:id', verifyJWT, async(req, res) =>{
+        app.patch('/booking/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
-            const filter = {_id: ObjectId(id)};
+            const filter = { _id: ObjectId(id) };
             const updatedDoc = {
                 $set: {
                     paid: true,
+                    status: payment.pending,
                     transactionId: payment.transactionId
                 }
             };
@@ -170,7 +171,21 @@ async function run() {
             const result = await paymentCollection.insertOne(payment);
             const updatedBooking = await orderCollection.updateOne(filter, updatedDoc);
             res.send(updatedDoc);
-          })
+        })
+
+        // update a user
+        app.put('/booking/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedItem = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: updatedItem.status
+                },
+            };
+            const result = await orderCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        })
 
         app.post('/order', async (req, res) => {
             const order = req.body;
@@ -178,7 +193,7 @@ async function run() {
             return res.send({ success: true, result });
         })
 
-        app.get('/review', async(req, res) =>{
+        app.get('/review', async (req, res) => {
             const reviews = await reviewCollection.find().toArray();
             res.send(reviews);
         })
@@ -194,24 +209,24 @@ async function run() {
             const filter = { _id: ObjectId(id) };
             const result = await orderCollection.deleteOne(filter);
             res.send(result);
-            
+
         })
         app.delete('/product/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(filter);
             res.send(result);
-            
+
         })
         app.delete('/user/:email', verifyJWT, verifyAdmin, async (req, res) => {
             const email = req.params.email;
-            const filter = { email: email};
+            const filter = { email: email };
             const result = await userCollection.deleteOne(filter);
             res.send(result);
-            
+
         })
     }
-    finally { 
+    finally {
 
     }
 }
