@@ -44,6 +44,7 @@ async function run() {
         const orderCollection = client.db('ar_parts_manufacturer').collection('orders');
         const userCollection = client.db('ar_parts_manufacturer').collection('users');
         const reviewCollection = client.db('ar_parts_manufacturer').collection('reviews');
+        const paymentCollection = client.db('ar_parts_manufacturer').collection('payments');
 
 
         const verifyAdmin = async (req, res, next) => {
@@ -150,10 +151,25 @@ async function run() {
 
         app.get('/booking/:id', verifyJWT, async(req, res) =>{
             const id = req.params.id;
-            console.log("id please", id)
             const query = {_id: ObjectId(id)};
             const order = await orderCollection.findOne(query);
             res.send(order);
+          })
+
+          app.patch('/booking/:id', verifyJWT, async(req, res) =>{
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = {_id: ObjectId(id)};
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+                }
+            };
+
+            const result = await paymentCollection.insertOne(payment);
+            const updatedBooking = await orderCollection.updateOne(filter, updatedDoc);
+            res.send(updatedDoc);
           })
 
         app.post('/order', async (req, res) => {
