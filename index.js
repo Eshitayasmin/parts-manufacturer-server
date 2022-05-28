@@ -145,7 +145,7 @@ async function run() {
             }
         })
 
-        app.get('/order', async (req, res) => {
+        app.get('/order', verifyJWT, async (req, res) => {
             const orders = await orderCollection.find().toArray();
             res.send(orders);
         })
@@ -210,14 +210,14 @@ async function run() {
             return res.send(result);
         })
 
-        app.delete('/order/:id', async (req, res) => {
+        app.delete('/order/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await orderCollection.deleteOne(filter);
             res.send(result);
 
         })
-        app.delete('/product/:id', async (req, res) => {
+        app.delete('/product/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(filter);
