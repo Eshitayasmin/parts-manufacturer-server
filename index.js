@@ -45,16 +45,16 @@ async function run() {
         const reviewCollection = client.db('ar_parts_manufacturer').collection('reviews');
 
 
-        const verifyAdmin = async (req, res, next) => {
-            const requester = req.decoded.email;
-            const requesterAccount = await userCollection.findOne({ email: requester });
-            if (requesterAccount.role === 'admin') {
-                next();
-            }
-            else {
-                return res.status(403).send({ message: 'Forbidden Access' });
-            }
-        }
+        // const verifyAdmin = async (req, res, next) => {
+        //     const requester = req.decoded.email;
+        //     const requesterAccount = await userCollection.findOne({ email: requester });
+        //     if (requesterAccount.role === 'admin') {
+        //         next();
+        //     }
+        //     else {
+        //         return res.status(403).send({ message: 'Forbidden Access' });
+        //     }
+        // }
 
         app.get('/product', async (req, res) => {
             const products = await productCollection.find().toArray();
