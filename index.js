@@ -64,7 +64,7 @@ async function run() {
             res.send(products);
         })
 
-
+       // get a product by id
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -82,7 +82,8 @@ async function run() {
             const users = await userCollection.find().toArray();
             res.send(users);
         })
-
+        
+        //payment method
         app.post('/create-payment-intent', async (req, res) => {
             const product = req.body;
             const price = product.price;
@@ -156,7 +157,8 @@ async function run() {
             const order = await orderCollection.findOne(query);
             res.send(order);
         })
-
+         
+        //update booking status
         app.patch('/booking/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
